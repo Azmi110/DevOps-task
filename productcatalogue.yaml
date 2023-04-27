@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: productcatalogue
+  labels:
+    app: productcatalogue
+apiVersion: apps/v1
+
+
+- name: Set up gcloud CLI
+  uses: google-github-actions/setup-gcloud@master
+  with:
+    version: '356.0.0'
+    project_id: YOUR_PROJECT_ID
+    service_account_key: ${{ secrets.GCP_SA_KEY }}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build Docker image
+        run: docker build -t productcatalogue:latest .
+
+      - name: Run Docker container to build Java project
+        run: docker run --rm -v $PWD:/app productcatalogue
+- name: Deploy to GCP
+  run: |
+    gcloud app deploy --quiet
+kind: Deployment
+
+
+
+
